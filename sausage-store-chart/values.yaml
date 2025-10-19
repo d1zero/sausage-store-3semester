@@ -1,7 +1,7 @@
 global:
   imagePullPolicy: Always
   vault:
-    host: 89.169.175.111
+    host: <your-vault-host-ip>
     name: vault
     vaultToken: someToken
 
@@ -13,11 +13,11 @@ frontend:
   service:
     port: 80
   ingress:
-    host: some-front.2sem.students-projects.ru
+    host: <your-id-or-login>.2sem.students-projects.ru
     path: /
     pathType: Prefix
   containerPort: 80
-  image: lawellet/sausage-frontend:latest
+  image: <your-dockerhub>/sausage-frontend:latest
   resources:
     requests:
       memory: "128Mi"
@@ -45,7 +45,7 @@ backend:
     rollingUpdate:
       maxUnavailable: 50%
       maxSurge: 20%
-  image: lawellet/sausage-backend:latest
+  image: <your-dockerhub>/sausage-backend:latest
   imagePullPolicy: Always
   resources:
     requests:
@@ -86,7 +86,7 @@ backend-report:
   env:
     port: 8080
     db: mongodb://reports:reportspassword@mongodb:27017/sausage-store
-  image: lawellet/sausage-backend-report:latest
+  image: <your-dockerhub>/sausage-backend-report:latest
   resources:
     requests:
       memory: "128Mi"
