@@ -28,20 +28,22 @@ resource "yandex_compute_instance" "sausage-store-vm-prod" {
   }
 
   metadata = {
-    ssh-keys = "sasuagestore:${file("./id_ed25519.pub")}"
+    ssh-keys = "sausagestore:${var.ssh_public_key}"
   }
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("./id_ed25519")
+    private_key = base64decode(var.ssh_private_key)
     host        = self.network_interface.0.nat_ip_address
   }
 
+  #Test egress
+
   provisioner "remote-exec" {
     inline = [ 
-      "ping -c 5 google.com",
-      "curl https://google.com"
+      "ping -c 5 ya.ru",
+      "curl https://ya.ru"
      ]
   }
 }
