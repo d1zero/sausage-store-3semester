@@ -173,6 +173,8 @@ ansible-deploy:
     - export VM_PROD=$(terraform output -raw vm_prod_address)
     - export VM_DEV=$(terraform output -raw vm_dev_address)
     - cd $ANSIBLE_ROOT
+    - pwd
+    - ls
     - envsubst < ./inventory/template-vm.ini > ./inventory/vm.ini
     - ansible-playbook vault-playbook.yml
   rules:
