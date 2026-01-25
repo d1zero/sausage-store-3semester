@@ -19,10 +19,10 @@ WORKDIR /app
 RUN addgroup --system jaruser
 RUN adduser -S -s /bin/false -G jaruser jaruser -D -H
 RUN apk add --no-cache dumb-init==1.2.5-r0 \
-    && apk add --update curl \
-    && rm -rf /var/cache/apk/* \
-    && mkdir -p /logs/reports \
-    && chown -R jaruser:jaruser /logs
+RUN apk add --update curl
+RUN rm -rf /var/cache/apk/*
+RUN mkdir -p /logs/reports
+RUN chown -R jaruser:jaruser /logs
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
 EXPOSE 8080
