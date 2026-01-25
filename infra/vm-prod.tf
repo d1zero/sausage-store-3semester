@@ -28,13 +28,13 @@ resource "yandex_compute_instance" "sausage-store-vm-prod" {
   }
 
   metadata = {
-    ssh-keys = "sasuagestore:${file("./id_rsa.pub")}"
+    ssh-keys = "sasuagestore:${file("./id_ed25519.pub")}"
   }
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("./id_rsa")
+    private_key = file("./id_ed25519")
     host        = self.network_interface.0.nat_ip_address
   }
 

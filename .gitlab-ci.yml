@@ -34,9 +34,9 @@ before_script:
   - cd ${TF_ROOT}
   - echo ${AUTHORIZED_KEY} | base64 -d > ./authorized_key.json
   - chmod 600 ./authorized_key.json
-  - echo ${PUB_SSH_KEY} | base64 -d > ./id_rsa.pub
-  - echo ${SSH_PRIVATE_KEY} | base64 -d > ./id_rsa
-  - chmod 600 id_rsa*
+  - echo ${PUB_SSH_KEY} | base64 -d > ./id_ed25519.pub
+  - echo ${SSH_PRIVATE_KEY} | base64 -d > ./id_ed25519
+  - chmod 600 id_ed25519*
 
 
 checkov:
@@ -64,7 +64,6 @@ plan:
   script:
     - cd ${TF_ROOT}
     - echo ${AUTHORIZED_KEY} | base64 -d > ./authorized_key.json
-    - echo $TF_VAR_folder_id
     - terraform init
       -backend-config="address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate"
       -backend-config="lock_address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate/lock"
