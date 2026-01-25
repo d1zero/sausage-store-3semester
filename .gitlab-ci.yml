@@ -152,6 +152,12 @@ destroy:
 
 terratest:
   stage: terratest
+  image: golang:1.25
+  variables:
+    TF_VAR_cloud_id: ${CLOUD_ID}
+    TF_VAR_folder_id: ${FOLDER_ID}
+    TF_VAR_ssh_public_key: ${SSH_PUBLIC_KEY}
+    TF_VAR_ssh_private_key: ${SSH_PRIVATE_KEY}
   script:
     - cd test
     - go mod tidy
