@@ -75,7 +75,9 @@ terratest:
   dependencies:
     - apply
   allow_failure: false 
-
+  rules:
+    - if: $APPLY == "true" && $OPERATION == "terraform"
+      when: manual
 
 ansible-deploy:
   stage: ansible_deploy
