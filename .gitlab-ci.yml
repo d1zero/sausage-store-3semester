@@ -50,14 +50,39 @@ plan:
     - terraform plan
   rules:
     - if: $OPERATION == "terraform"
-      when: always 
+      wYC_CLOUD_IDhen: always 
 
 
 apply:
   stage: apply
+  image:
+    name: hashicorp/terraform:latest
+    entrypoint: [""]
+  variables:
+    TF_VAR_cloud_id: ${CLOUD_ID}
+    TF_VAR_folder_id: ${FOLDER_ID}
+    TF_VAR_ssh_public_key: ${SSH_PUBLIC_KEY}
+    TF_VAR_ssh_private_key: ${SSH_PRIVATE_KEY}
   script:
+    - cd ${TF_ROOT}
+    - echo ${AUTHORIZED_KEY} | base64 -d > ./authorized_key.json
     - terraform init
+      -backend-config="address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate"
+      -backend-config="lock_address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate/lock"
+      -backend-config="unlock_address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate/lock"
+      -backend-config="lock_method=POST"
+      -backend-config="unlock_method=DELETE"
+      -backend-config="username=terraform"
+      -backend-config="password=${TF_HTTP_PASSWORD}"
+      -backend-config="retry_wait_min=5"
     - terraform apply -auto-approve
+  artifacts:
+    paths:
+      - ${TF_ROOT}/.terraform
+  needs:
+    - plan
+  dependencies:
+    - plan
   rules:
     - if: $OPERATION == "terraform" && $APPLY == "true"
       when: manual
