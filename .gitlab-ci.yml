@@ -64,6 +64,7 @@ plan:
   script:
     - cd ${TF_ROOT}
     - echo ${AUTHORIZED_KEY} | base64 -d > ./authorized_key.json
+    - echo $TF_VAR_folder_id
     - terraform init
       -backend-config="address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate"
       -backend-config="lock_address=https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/${CI_PROJECT_ID}/terraform/state/tfstate/lock"
