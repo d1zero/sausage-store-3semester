@@ -16,9 +16,9 @@ FROM eclipse-temurin:16-jdk-alpine
 ARG VERSION=${VERSION}
 WORKDIR /app
 # создаём пользователя jaruser
-RUN addgroup --system jaruser \
-    && adduser -S -s /bin/false -G jaruser jaruser -D -H \
-    && apk add --no-cache dumb-init==1.2.5-r0 \
+RUN addgroup --system jaruser
+RUN adduser -S -s /bin/false -G jaruser jaruser -D -H
+RUN apk add --no-cache dumb-init==1.2.5-r0 \
     && apk add --update curl \
     && rm -rf /var/cache/apk/* \
     && mkdir -p /logs/reports \
