@@ -7,5 +7,6 @@
 
 - name: install vault
   hosts: all
+  become: true
   roles:
     - vault
