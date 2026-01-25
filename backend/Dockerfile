@@ -16,14 +16,14 @@ FROM eclipse-temurin:16-jdk-alpine
 ARG VERSION=${VERSION}
 WORKDIR /app
 # создаём пользователя jaruser
-RUN addgroup --system jaruser
-RUN adduser -S -s /bin/false -G jaruser jaruser -D -H
-RUN apk update --no-cache
-RUN apk add --no-cache dumb-init
-RUN apk add --update curl
-RUN rm -rf /var/cache/apk/*
-RUN mkdir -p /logs/reports
-RUN chown -R jaruser:jaruser /logs
+RUN addgroup --system jaruser \
+    && adduser -S -s /bin/false -G jaruser jaruser -D -H \
+    && apk update --no-cache \
+    && apk add --no-cache dumb-init \
+    && apk add --update curl \
+    && rm -rf /var/cache/apk/* \
+    && mkdir -p /logs/reports \
+    && chown -R jaruser:jaruser /logs
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
 EXPOSE 8080

@@ -211,7 +211,7 @@ package-helm-chart:
     - export NEW_VER=$(echo "$CURRENT_VER" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
     - yq e -i '.version = env(NEW_VER)' sausage-store-chart/Chart.yaml
     - helm package ./sausage-store-chart/
-    - curl -u "$NEXUS_HELM_REPO_USER:$NEXUS_HELM_REPO_PASSWORD" $NEXUS_HELM_REPO --upload-file *.tgz
+    - curl -u "$NEXUS_HELM_REPO_USER:$NEXUS_HELM_REPO_PASSWORD" $NEXUS_HELM_REPO_URL --upload-file *.tgz
   needs:
     - build-and-push-images
   rules:
