@@ -49,7 +49,7 @@ func TestVirtualMachineAvailability(t *testing.T) {
 	// Проверка существования ВМ
 	computeService := yc.Compute().Instance()
 	instances, err := computeService.List(ctx, &compute.ListInstancesRequest{
-		FolderId: "***", // Укажите ваш Folder ID
+		FolderId: "b1g3l5vhubit86v2h8kr",
 	})
 	if err != nil {
 		t.Fatalf("Failed to list instances: %v", err)
