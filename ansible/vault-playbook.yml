@@ -1,0 +1,10 @@
+---
+- name: install docker
+  hosts: all
+  roles:
+    - docker
+
+- name: install vault
+  hosts: all
+  roles:
+    - vault

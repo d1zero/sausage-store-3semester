@@ -12,9 +12,9 @@ terraform {
 
 
   backend "http" {
-    address = "<repo-address>"
-    lock_address="<repo-address>"
-    unlock_address="<repo-address>"
+    address = "https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/138/terraform/state/tfstate"
+    lock_address="https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/138/terraform/state/tfstate/lock"
+    unlock_address="https://cloud-services-engineer.gitlab.yandexcloud.net/api/v4/projects/138/terraform/state/tfstate/lock"
     lock_method="POST"
     unlock_method="DELETE"
     retry_wait_min=5

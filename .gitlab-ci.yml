@@ -1,42 +1,137 @@
-# Пример stages для пайплайна
-# stages:
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}/infra
+  OPERATION:
+    description: "Select CI/CD-operation"
+    value: "terraform"
+    options:
+      - "terraform"
+      - "ansible"
+      - "k8s"
+  APPLY:
+    description: "Hand apply infra"
+    value: "false"
+    options:
+      - "false"
+      - "true"
+  DESTROY:
+    description: "Hand destroy infra"
+    value: "false"
+    options:
+      - "false"
+      - "true"
+
+stages:
 #   - tests
-#   - plan
-#   - apply
-#   - terratest
+  - plan
+  - apply
+  - terratest
 #   - ansible_deploy
-#   - destroy
+  - destroy
 #   - build
 #   - package
-  
+
+before_script:
+  - cd ${TF_ROOT}
+  - echo ${AUTHORIZED_KEY} | base64 -d > ./authorized_key.json
+  - chmod 600 ./authorized_key.json
+  - echo ${PUB_SSH_KEY} | base64 -d > ./id_rsa.pub
+  - echo ${SSH_PRIVATE_KEY} | base64 -d > ./id_rsa
+  - chmod 600 id_rsa*
+
   
 # Выполнение тестов checkov
 #security_scan:
 
 
-# Terraform plan для инфраструктуры
-#plan:
+plan:
+  stage: plan
+  script:
+    - terraform init
+    - terraform plan
+  rules:
+    - if: $OPERATION == "terraform"
+      when: always 
 
 
-# Создание инфраструктуры Terraform
-#apply:
+apply:
+  stage: apply
+  script:
+    - terraform init
+    - terraform apply -auto-approve
+  rules:
+    - if: $OPERATION == "terraform" && $APPLY == "true"
+      when: manual
 
 
-# Выполнение тестов terratest
-#terratest:
+terratest:
+  stage: terratest
+  script:
+    - cd test
+    - go mod init terratest
+    - go mod tidy
+    - go test -v
+  needs:
+    - apply
+  dependencies:
+    - apply
+  allow_failure: false 
 
 
-# Деплой ansible-playbook
-#ansible-deploy:
+ansible-deploy:
+  stage: ansible-deploy
+  script:
+    - cd $TF_ROOT
+    - terraform init
+    - export VM_PROD=$(terraform output -raw vm_prod_address)
+    - export VM_DEV=$(terraform output -raw vm_dev_address)
+    - cd $ANSIBLE_ROOT
+    - envsubst < ./inventory/template-vm.ini > ./inventory/vm.ini
+    - ansible-playbook vault-playbook.yml
+  rules:
+    - if: $APPLY == "true" && $OPERATION == "ansible"
+      when: manual
+
+destroy:
+  stage: destroy
+  script:
+    - terraform init
+    - terraform refresh
+    - terraform destroy -auto-approve
+  rules:
+    - if: $DESTROY == "true" && $OPERATION == "terraform"
+      when: manual
 
 
-# Удаление инфраструктуры Terraform
-#destroy:
+build-and-push-images:
+  stage: build
+  before_script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  script:
+    - docker build --build-arg VERSION=$CI_COMMIT_SHA --push -t $DOCKER_USER/sausage-backend:latest ./backend/
+    - docker build --push -t $DOCKER_USER/sausage-frontend:latest ./frontend/
+    - docker build --push -t $DOCKER_USER/sausage-backend-report:latest ./backend-report/
+  rules:
+    - if: $OPERATION == "k8s"
+      when: always
 
 
-# Сборка и пуш Docker-образов в DockerHub
-#build-and-push-images:
-
-
-# Упаковка и пуш Helm-чарта в Nexus
-#package-helm-chart:
+package-helm-chart:
+  stage: package
+  image: 
+    name: alpine/helm:3.12.0
+    entrypoint: [""]
+  script:
+    - cd $CI_PROJECT_DIR
+    - apk add curl yq
+    - export CURRENT_VER=$(helm show chart ./sausage-store-chart | yq '.version')
+    - export NEW_VER=$(echo "$CURRENT_VER" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+    - yq e -i '.version = env(NEW_VER)' sausage-store-chart/Chart.yaml
+    - helm package ./sausage-store-chart/
+    - curl -u "$NEXUS_HELM_REPO_USER:$NEXUS_HELM_REPO_PASSWORD" $NEXUS_HELM_REPO --upload-file *.tgz
+  needs:
+    - build-and-push-images
+  rules:
+    - if: $OPERATION == "k8s"
+      when: manual
+  tags:
+    - docker 
