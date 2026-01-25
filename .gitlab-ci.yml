@@ -1,5 +1,6 @@
 variables:
   TF_ROOT: ${CI_PROJECT_DIR}/infra
+  ANSIBLE_ROOT: ${CI_PROJECT_DIR}/ansible
   OPERATION:
     description: "Select CI/CD-operation"
     value: "terraform"
@@ -153,7 +154,6 @@ terratest:
   stage: terratest
   script:
     - cd test
-    - go mod init terratest
     - go mod tidy
     - go test -v
   needs:
