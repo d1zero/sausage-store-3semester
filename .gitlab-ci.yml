@@ -78,7 +78,7 @@ terratest:
 
 
 ansible-deploy:
-  stage: ansible-deploy
+  stage: ansible_deploy
   script:
     - cd $TF_ROOT
     - terraform init
