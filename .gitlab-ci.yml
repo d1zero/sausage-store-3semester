@@ -21,14 +21,14 @@ variables:
       - "true"
 
 stages:
-#   - tests
+  - tests
   - plan
   - apply
   - terratest
-#   - ansible_deploy
+  - ansible_deploy
   - destroy
-#   - build
-#   - package
+  - build
+  - package
 
 before_script:
   - cd ${TF_ROOT}
