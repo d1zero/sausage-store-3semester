@@ -27,6 +27,7 @@ spec:
             cpu: "50m"
           limits:
             memory: "256Mi"
+            cpu: "100m"
         volumeMounts:
         - name: postgresql-data
           mountPath: /var/lib/postgresql/data
